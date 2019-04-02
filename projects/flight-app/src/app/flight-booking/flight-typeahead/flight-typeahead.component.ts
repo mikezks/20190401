@@ -1,6 +1,16 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { timer, Observable, Subscription, Subject } from 'rxjs';
-import {tap, take, takeUntil, switchMap, debounceTime, filter} from 'rxjs/operators';
+import {timer, Observable, Subscription, Subject, interval, combineLatest, of, pipe, iif} from 'rxjs';
+import {
+    tap,
+    take,
+    takeUntil,
+    switchMap,
+    debounceTime,
+    filter,
+    startWith,
+    map,
+    distinctUntilChanged, merge
+} from 'rxjs/operators';
 import {FormControl} from "@angular/forms";
 import {Flight} from "@flight-workspace/flight-api";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
@@ -18,6 +28,8 @@ export class FlightTypeaheadComponent implements OnInit, OnDestroy {
   control = new FormControl();
   flights$: Observable<Flight[]>;
   loading: boolean;
+  online$: Observable<boolean>;
+  online: boolean;
 
 
   constructor(private http: HttpClient) { }
@@ -28,14 +40,47 @@ export class FlightTypeaheadComponent implements OnInit, OnDestroy {
   }
 
   initTypeahead(): void {
+
+    this.online$ = interval(2000)
+        .pipe(
+          startWith(0),
+          map(x => Math.random() < 0.5),
+          distinctUntilChanged(),
+          tap(x => this.online = x)
+        );
+
     this.flights$ =
         this.control.valueChanges
             .pipe(
+                value => combineLatest(value, this.online$),
+                filter(([value, online]) => online),
+                map (([value, online]) => value),
+                distinctUntilChanged(),
                 debounceTime(300),
-                filter((value: string) => value.length > 2),
-                tap(() => this.loading = true),
-                switchMap(value => this.load(value)),
-                tap(() => this.loading = false)
+                switchMap((value: string) =>
+                  iif(
+                      () => value.length > 2,
+                      of(value)
+                          .pipe(
+                            tap(() => this.loading = true),
+                            switchMap(value => this.load(value)),
+                            tap(() => this.loading = false)
+                          ),
+                      of([])
+                  )
+                /*{
+                  if (value.length > 2) {
+                      return of(value)
+                          .pipe(
+                            tap(() => this.loading = true),
+                            switchMap(value => this.load(value)),
+                            tap(() => this.loading = false)
+                          );
+                  } else {
+                      return of([]);
+                  }
+                }*/
+                )
             );
   }
 
