@@ -3,7 +3,7 @@ import {Flight, FlightService} from '@flight-workspace/flight-api';
 import {Observable} from "rxjs";
 import * as fromFlightBooking from '../+state/reducers/flight-booking.reducer';
 import {select, Store} from "@ngrx/store";
-import {FlightsLoadedAction, FlightUpdateAction} from "../+state/actions/flight-booking.actions";
+import {FlightsLoadAction, FlightUpdateAction} from "../+state/actions/flight-booking.actions";
 import {first} from "rxjs/operators";
 
 @Component({
@@ -29,9 +29,7 @@ export class FlightSearchComponent implements OnInit {
     "5": true
   };
 
-  constructor(
-    private flightService: FlightService,
-    private store: Store<fromFlightBooking.FeatureState>) {
+  constructor(private store: Store<fromFlightBooking.FeatureState>) {
   }
 
   ngOnInit() {
@@ -47,13 +45,15 @@ export class FlightSearchComponent implements OnInit {
     /*this.flightService
       .load(this.from, this.to, this.urgent);*/
 
-    this.flightService.find(this.from, this.to)
+    /*this.flightService.find(this.from, this.to)
         .subscribe(
             flights =>
               this.store.dispatch(new FlightsLoadedAction(flights)),
             error =>
               console.error('error', error)
-        );
+        );*/
+
+    this.store.dispatch(new FlightsLoadAction(this.from, this.to));
   }
 
   delay(): void {
@@ -64,7 +64,7 @@ export class FlightSearchComponent implements OnInit {
             first()
         )
         .subscribe(
-              (flights: Flight[]) => {
+            (flights: Flight[]) => {
               const flight = flights[0];
 
               const oldDate = new Date(flight.date);
