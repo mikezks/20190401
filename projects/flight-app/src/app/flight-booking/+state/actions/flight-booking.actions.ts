@@ -2,9 +2,8 @@ import { Action } from '@ngrx/store';
 import {Flight} from "@flight-workspace/flight-api";
 
 export enum FlightBookingActionTypes {
-  FlightsLoadedAction = '[FlightBooking] Flights loaded',
-  
-  
+    FlightsLoadedAction = '[FlightBooking] Flights loaded',
+    FlightUpdateAction = '[FlightBooking] Update Flights'
 }
 
 export class FlightsLoadedAction implements Action {
@@ -12,5 +11,12 @@ export class FlightsLoadedAction implements Action {
   constructor(readonly flights: Flight[]) {}
 }
 
+export class FlightUpdateAction implements Action {
+    readonly type = FlightBookingActionTypes.FlightUpdateAction;
+    constructor(readonly flight: Flight) {}
+}
 
-export type FlightBookingActions = FlightsLoadedAction;
+
+export type FlightBookingActions =
+    FlightsLoadedAction |
+    FlightUpdateAction;

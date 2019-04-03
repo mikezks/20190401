@@ -3,7 +3,8 @@ import {Flight, FlightService} from '@flight-workspace/flight-api';
 import {Observable} from "rxjs";
 import * as fromFlightBooking from '../+state/reducers/flight-booking.reducer';
 import {select, Store} from "@ngrx/store";
-import {FlightsLoadedAction} from "../+state/actions/flight-booking.actions";
+import {FlightsLoadedAction, FlightUpdateAction} from "../+state/actions/flight-booking.actions";
+import {first} from "rxjs/operators";
 
 @Component({
   selector: 'flight-search',
@@ -56,7 +57,23 @@ export class FlightSearchComponent implements OnInit {
   }
 
   delay(): void {
-    this.flightService.delay();
+    //this.flightService.delay();
+
+    this.flights$
+        .pipe(
+            first()
+        )
+        .subscribe(
+              (flights: Flight[]) => {
+              const flight = flights[0];
+
+              const oldDate = new Date(flight.date);
+              const newDate = new Date(oldDate.getTime() + 15 * 60 * 1000);
+              const newFlight = { ...flight, date: newDate.toISOString() };
+
+              this.store.dispatch(new FlightUpdateAction(newFlight));
+            }
+        );
   }
 
 }
