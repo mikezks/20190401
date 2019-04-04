@@ -24,6 +24,7 @@ import { environment } from '../environments/environment';
 import {EffectsModule} from "@ngrx/effects";
 import {AppEffects} from "./+state/effects/app.effects";
 import {RouterStateSerializer, StoreRouterConnectingModule} from "@ngrx/router-store";
+import {OAuthModule} from "angular-oauth2-oidc";
 
 
 @NgModule({
@@ -36,6 +37,7 @@ import {RouterStateSerializer, StoreRouterConnectingModule} from "@ngrx/router-s
     FlightCancellingModule,
     DashboardModule,
     DashboardTileModule,
+    OAuthModule.forRoot(),
     
     FlightApiModule.forRoot(),
     SharedModule.forRoot(),

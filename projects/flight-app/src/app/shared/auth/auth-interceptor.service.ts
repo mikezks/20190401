@@ -3,15 +3,23 @@ import {HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest}
 import {Router} from "@angular/router";
 import {Observable, throwError} from "rxjs";
 import {catchError} from "rxjs/operators";
+import {OAuthStorage} from "angular-oauth2-oidc";
 
 @Injectable()
 export class AuthInterceptorService implements HttpInterceptor {
 
-    constructor(private router: Router) { }
+    constructor(
+        private router: Router,
+        private storage: OAuthStorage) { }
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         if (req.url.startsWith('http://www.angular.at')) {
-          const headers = req.headers.set('Authorization', 'Dummy Token for Demo');
+          // const headers = req.headers.set('Authorization', 'Dummy Token for Demo');
+          const headers = req.headers
+                  .set(
+                    'Authorization',
+                    'Bearer ' + this.storage.getItem('access_token')
+                  );
           req = req.clone({ headers });
         }
         return next
