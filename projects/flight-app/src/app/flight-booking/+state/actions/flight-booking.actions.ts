@@ -19,7 +19,7 @@ export class FlightUpdateAction implements Action {
 
 export class FlightsLoadAction implements Action {
     readonly type = FlightBookingActionTypes.FlightsLoadAction;
-    constructor(readonly from: string, readonly to: string) {}
+    constructor(readonly from: string, readonly to: string, readonly urgent: boolean) {}
 }
 
 

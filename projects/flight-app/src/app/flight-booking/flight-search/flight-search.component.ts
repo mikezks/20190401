@@ -55,7 +55,7 @@ export class FlightSearchComponent implements OnInit {
               console.error('error', error)
         );*/
 
-    this.store.dispatch(new FlightsLoadAction(this.from, this.to));
+    this.store.dispatch(new FlightsLoadAction(this.from, this.to, this.urgent));
   }
 
   delay(): void {
